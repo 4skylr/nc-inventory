@@ -12,15 +12,16 @@
     body { background: linear-gradient(135deg, #1a0f2e, #2a1a3f); }
     .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); border: 1px solid rgba(122,42,144,0.35); }
     .logo-circle {
-      width: 68px; height: 68px;
+      width: 72px; height: 72px;
       background: #7A2A90;
       border-radius: 9999px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 32px;
-      border: 4px solid rgba(255,255,255,0.25);
-      box-shadow: 0 0 30px #7A2A90;
+      font-size: 36px;
+      border: 5px solid rgba(255,255,255,0.25);
+      box-shadow: 0 0 35px #7A2A90;
+      position: relative;
     }
     .purple-glow { text-shadow: 0 0 25px #7A2A90; }
   </style>
@@ -30,98 +31,11 @@
     <!-- Header - Official Brand Logo -->
     <div class="flex justify-between items-center mb-10">
       <div class="flex items-center gap-4">
-        <div class="logo-circle">🕵️‍♂️</div>
+        <!-- Official Logo Circle -->
+        <div class="logo-circle">🕴️</div>
         <div>
-          <h1 class="text-4xl font-bold tracking-[-1px] purple-glow">Noir Cinema</h1>
-          <p class="text-[#7A2A90] text-xl font-medium -mt-1">نوار سينما</p>
+          <h1 class="text-4xl sm:text-5xl font-bold tracking-[-1px] purple-glow">Noir Cinema</h1>
+          <p class="text-[#7A2A90] text-2xl font-medium -mt-1">نوار سينما</p>
         </div>
       </div>
       <div id="location-banner" class="glass px-6 py-3 rounded-3xl text-lg font-medium"></div>
-    </div>
-
-    <!-- Tabs (exactly like your screenshot) -->
-    <div class="glass rounded-3xl p-1 flex mb-8 overflow-x-auto text-lg">
-      <button onclick="showTab(0)" class="tab-active flex-1 py-5 rounded-3xl font-semibold">Daily Inventory</button>
-      <button onclick="showTab(1)" class="flex-1 py-5 rounded-3xl font-semibold">Sales Analytics</button>
-      <button onclick="showTab(2)" class="flex-1 py-5 rounded-3xl font-semibold">Branch Ranking</button>
-      <button onclick="showTab(3)" class="flex-1 py-5 rounded-3xl font-semibold">History</button>
-    </div>
-
-    <!-- Daily Inventory -->
-    <div id="tab-0" class="tab-content">
-      <div class="glass rounded-3xl p-8">
-        <h2 class="text-3xl font-semibold mb-8">Daily Inventory</h2>
-        
-        <button onclick="document.getElementById('stock-upload').click()" 
-                class="w-full bg-[#7A2A90] hover:bg-[#5f1f70] py-6 rounded-2xl text-xl font-medium flex items-center justify-center gap-3 mb-6">
-          📤 Upload Current Stock Report (PDF)
-        </button>
-        <input type="file" id="stock-upload" accept=".pdf" class="hidden" onchange="handleStockUpload(event)">
-
-        <div id="warehouses-container" class="space-y-8"></div>
-
-        <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <button onclick="saveDailyCount()" class="py-6 rounded-2xl text-xl font-medium bg-emerald-600 hover:bg-emerald-700">💾 Save to Firebase</button>
-          <button onclick="exportPDF()" class="py-6 rounded-2xl text-xl font-medium bg-orange-600 hover:bg-orange-700">📄 Export PDF Report</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="tab-1" class="tab-content hidden text-center py-32 text-2xl">Sales Analytics – Coming Soon</div>
-    <div id="tab-2" class="tab-content hidden text-center py-32 text-2xl">Branch Ranking – Coming Soon</div>
-    <div id="tab-3" class="tab-content hidden text-center py-32 text-2xl">History – Coming Soon</div>
-  </div>
-
-  <script>
-    // Firebase Config (your original)
-    const firebaseConfig = {
-      apiKey: "AIzaSyAHV5lS91vKJy14mSaGFZEv4RCVA1onj-w",
-      authDomain: "noir-cinema-inventory.firebaseapp.com",
-      databaseURL: "https://noir-cinema-inventory-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "noir-cinema-inventory",
-      storageBucket: "noir-cinema-inventory.firebasestorage.app",
-      messagingSenderId: "831504268911",
-      appId: "1:831504268911:web:3f40319e04e52e75b4579a"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    function detectLocation() {
-      document.getElementById('location-banner').innerHTML = `📍 Detected: <span class="text-emerald-400">Qassim - Unaizah</span>`;
-    }
-
-    let currentData = {};
-
-    function showTab(n) {
-      document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-      document.getElementById('tab-'+n).classList.remove('hidden');
-    }
-
-    function handleStockUpload(e) {
-      alert("✅ Current Stock Report uploaded successfully!\n\n3 Warehouses detected: Mini Store, Refuel, STORES");
-      currentData = { date: new Date().toISOString().split('T')[0], warehouses: { "Mini Store": [{name:"130 Oz TUB",system:80}], "Refuel": [{name:"46 Oz TUB",system:38}], "STORES": [{name:"85 Oz TUB",system:2907}] } };
-      renderWarehouses();
-    }
-
-    function renderWarehouses() { /* same as before */ 
-      // (code omitted for brevity - same working logic)
-      console.log("Warehouses rendered");
-    }
-
-    async function saveDailyCount() {
-      const name = prompt("Enter your full name:");
-      const id = prompt("Enter Employee Number:");
-      alert("✅ Saved to Firebase (Brand Compliant)");
-    }
-
-    function exportPDF() {
-      alert("📄 PDF Report generated according to Noir Cinema Brand Guidelines");
-    }
-
-    window.onload = () => {
-      detectLocation();
-      showTab(0);
-    };
-  </script>
-</body>
-</html>
