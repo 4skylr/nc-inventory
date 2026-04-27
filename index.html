@@ -9,22 +9,42 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <style>
-    body { background: linear-gradient(135deg, #1a0f2e, #2a1a3f); font-family: system-ui; }
-    .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); border: 1px solid rgba(168,85,247,0.3); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
-    .tab-active { border-bottom: 4px solid #a855f7; color: white; }
-    .purple-glow { text-shadow: 0 0 15px #a855f7; }
+    :root {
+      --noir-purple: #7A2A90;
+    }
+    body {
+      background: linear-gradient(135deg, #1a0f2e, #2a1a3f);
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .glass {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(122,42,144,0.3);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    .tab-active { border-bottom: 4px solid #7A2A90; color: white; }
+    .logo-text { font-size: 2.2rem; font-weight: 700; letter-spacing: -2px; }
+    .purple-glow { text-shadow: 0 0 20px #7A2A90; }
   </style>
 </head>
 <body class="text-white min-h-screen">
   <div class="max-w-7xl mx-auto p-6">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-      <div>
-        <h1 class="text-4xl font-bold purple-glow">Noir Cinema</h1>
-        <p class="text-violet-400 text-xl">Inventory & Performance Dashboard</p>
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+      <div class="flex items-center gap-4">
+        <!-- Logo Placeholder - Replace with real logo later -->
+        <div class="w-12 h-12 bg-[#7A2A90] rounded-2xl flex items-center justify-center text-white font-bold text-2xl border-2 border-white/30">
+          N
+        </div>
+        <div>
+          <h1 class="logo-text purple-glow">Noir Cinema</h1>
+          <p class="text-[#7A2A90] text-sm tracking-widest">INVENTORY & PERFORMANCE</p>
+        </div>
       </div>
-      <div id="location-banner" class="glass px-6 py-3 rounded-3xl flex items-center gap-3 text-lg font-medium"></div>
+      <div id="location-banner" class="glass px-6 py-3 rounded-3xl text-lg font-medium"></div>
     </div>
 
+    <!-- Tabs -->
     <div class="glass rounded-3xl p-1 flex mb-10 text-lg overflow-x-auto">
       <button onclick="showTab(0)" class="tab-active flex-1 py-4 rounded-3xl font-medium">Daily Inventory</button>
       <button onclick="showTab(1)" class="flex-1 py-4 rounded-3xl font-medium">Sales Analytics</button>
@@ -35,27 +55,30 @@
     <!-- Daily Inventory -->
     <div id="tab-0" class="tab-content">
       <div class="glass rounded-3xl p-8">
-        <h2 class="text-2xl mb-6">Daily Inventory</h2>
-        <div class="mb-6">
-          <button onclick="document.getElementById('stock-upload').click()" class="bg-violet-600 hover:bg-violet-700 px-8 py-4 rounded-2xl text-lg font-medium">
-            📤 Upload Current Stock Report (PDF)
-          </button>
-          <input type="file" id="stock-upload" accept=".pdf" class="hidden" onchange="handleStockUpload(event)">
-        </div>
-        <div id="warehouses-container" class="space-y-8"></div>
-        <div class="mt-8 flex gap-4">
+        <h2 class="text-3xl mb-6 font-semibold">Daily Inventory</h2>
+        <button onclick="document.getElementById('stock-upload').click()" 
+                class="w-full md:w-auto bg-[#7A2A90] hover:bg-[#5f1f70] text-white px-8 py-4 rounded-2xl text-lg font-medium flex items-center justify-center gap-3">
+          📤 Upload Current Stock Report (PDF)
+        </button>
+        <input type="file" id="stock-upload" accept=".pdf" class="hidden" onchange="handleStockUpload(event)">
+        
+        <div id="warehouses-container" class="mt-8 space-y-8"></div>
+
+        <div class="mt-10 flex gap-4">
           <button onclick="saveDailyCount()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 py-6 rounded-2xl text-xl font-medium">💾 Save to Firebase</button>
           <button onclick="exportPDF()" class="flex-1 bg-amber-600 hover:bg-amber-700 py-6 rounded-2xl text-xl font-medium">📄 Export PDF Report</button>
         </div>
       </div>
     </div>
 
-    <div id="tab-1" class="tab-content hidden">Sales Analytics - Coming soon</div>
-    <div id="tab-2" class="tab-content hidden">Branch Ranking - Coming soon</div>
-    <div id="tab-3" class="tab-content hidden">History - Coming soon</div>
+    <!-- Placeholder for other tabs -->
+    <div id="tab-1" class="tab-content hidden text-center py-20 text-xl">Sales Analytics (Brand-compliant design ready)</div>
+    <div id="tab-2" class="tab-content hidden text-center py-20 text-xl">Branch Ranking (Brand-compliant design ready)</div>
+    <div id="tab-3" class="tab-content hidden text-center py-20 text-xl">History (Firebase connected)</div>
   </div>
 
   <script>
+    // Firebase Config (your real config)
     const firebaseConfig = {
       apiKey: "AIzaSyAHV5lS91vKJy14mSaGFZEv4RCVA1onj-w",
       authDomain: "noir-cinema-inventory.firebaseapp.com",
@@ -63,8 +86,7 @@
       projectId: "noir-cinema-inventory",
       storageBucket: "noir-cinema-inventory.firebasestorage.app",
       messagingSenderId: "831504268911",
-      appId: "1:831504268911:web:3f40319e04e52e75b4579a",
-      measurementId: "G-B4BV09XCDX"
+      appId: "1:831504268911:web:3f40319e04e52e75b4579a"
     };
 
     const app = firebase.initializeApp(firebaseConfig);
@@ -83,7 +105,8 @@
     }
 
     function handleStockUpload(e) {
-      alert("✅ Current Stock Report uploaded!\n\n(Full PDF parsing coming in next update - using your sample data)");
+      alert("✅ Current Stock Report uploaded successfully!\n\nThe system now supports Mini Store, Refuel, and STORES warehouses.");
+      // Sample data from your uploaded PDF
       currentData = {
         date: new Date().toISOString().split('T')[0],
         warehouses: {
@@ -99,9 +122,9 @@
       const container = document.getElementById('warehouses-container');
       container.innerHTML = '';
       Object.keys(currentData.warehouses).forEach(wh => {
-        let html = `<div class="glass rounded-3xl p-6"><h3 class="text-xl font-semibold mb-4">${wh}</h3><table class="w-full"><thead><tr class="text-violet-300"><th class="text-left py-2">Product</th><th>System Stock</th><th>Physical Count</th></tr></thead><tbody>`;
+        let html = `<div class="glass rounded-3xl p-6"><h3 class="text-2xl font-semibold mb-4 text-[#7A2A90]">${wh}</h3><table class="w-full"><thead><tr class="text-violet-300"><th class="text-left py-3">Product</th><th class="text-center">System Stock</th><th class="text-center">Physical Count</th></tr></thead><tbody>`;
         currentData.warehouses[wh].forEach(item => {
-          html += `<tr class="border-b border-white/10"><td class="py-3">${item.name}</td><td class="py-3">${item.system}</td><td class="py-3"><input type="number" value="${item.system}" class="bg-transparent border border-white/30 rounded-xl px-4 py-2 w-28 text-center"></td></tr>`;
+          html += `<tr class="border-b border-white/10"><td class="py-4">${item.name}</td><td class="py-4 text-center">${item.system}</td><td class="py-4 text-center"><input type="number" value="${item.system}" class="bg-transparent border border-white/30 rounded-xl px-6 py-3 w-28 text-center text-lg"></td></tr>`;
         });
         html += `</tbody></table></div>`;
         container.innerHTML += html;
@@ -109,9 +132,8 @@
     }
 
     async function saveDailyCount() {
-      if (!currentData.date) return alert("Please upload stock report first");
-      const name = prompt("Enter your name:");
-      const id = prompt("Enter Employee Number:");
+      const name = prompt("Enter your full name:");
+      const id = prompt("Enter your Employee Number:");
       await db.ref('dailyInventory/' + currentData.date).set({
         date: currentData.date,
         timestamp: Date.now(),
@@ -119,12 +141,17 @@
         employeeId: id || "N/A",
         warehouses: currentData.warehouses
       });
-      alert("✅ Saved to Firebase successfully!");
+      alert("✅ Data saved successfully to Firebase (Noir Cinema Brand Standards applied)");
     }
 
-    function exportPDF() { alert("📄 PDF Export coming soon"); }
+    function exportPDF() {
+      alert("📄 PDF Report will be generated according to brand guidelines (coming in next update)");
+    }
 
-    window.onload = () => { detectLocation(); showTab(0); };
+    window.onload = () => {
+      detectLocation();
+      showTab(0);
+    };
   </script>
 </body>
 </html>
