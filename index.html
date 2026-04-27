@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Noir Cinema • Inventory & Performance</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    body { background: linear-gradient(135deg, #0a0a0a, #1a1a2e); }
+    .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+    .tab-active { border-bottom: 4px solid #a78bfa; }
+  </style>
+</head>
+<body class="text-white">
+  <div class="max-w-7xl mx-auto p-6">
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-4xl font-bold">Noir Cinema</h1>
+      <p class="text-violet-400 text-xl">Inventory & Performance Dashboard</p>
+      <div class="glass px-6 py-3 rounded-3xl flex items-center gap-3">
+        Detected: <span class="font-semibold text-emerald-400">Qassim - Unaizah 🇸🇦</span>
+      </div>
+    </div>
+
+    <div class="glass rounded-3xl p-1 flex mb-10 text-lg">
+      <button onclick="showTab(0)" class="tab-active flex-1 py-4 rounded-3xl font-medium">Daily Inventory</button>
+      <button onclick="showTab(1)" class="flex-1 py-4 rounded-3xl font-medium">Sales Analytics</button>
+      <button onclick="showTab(2)" class="flex-1 py-4 rounded-3xl font-medium">Branch Ranking</button>
+      <button onclick="showTab(3)" class="flex-1 py-4 rounded-3xl font-medium">History</button>
+    </div>
+
+    <!-- Daily Inventory -->
+    <div id="tab-0" class="tab-content">
+      <div class="glass rounded-3xl p-8">
+        <h2 class="text-2xl mb-6">Daily Inventory - Unaizah Store</h2>
+        <table class="w-full"><thead><tr class="text-violet-300"><th class="text-left py-4">Product</th><th>System Stock</th><th>Physical Count</th><th>Difference</th></tr></thead>
+        <tbody id="inv-body" class="text-sm"></tbody></table>
+      </div>
+    </div>
+
+    <!-- Sales Analytics -->
+    <div id="tab-1" class="tab-content hidden">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="glass rounded-3xl p-8"><h3>YTD Sales (RM)</h3><div class="text-6xl font-bold text-violet-300 mt-2">8,194</div></div>
+        <div class="glass rounded-3xl p-8"><h3>Best Month</h3><div class="text-6xl font-bold">April</div><p class="text-4xl text-emerald-400">RM 2,419</p></div>
+        <div class="glass rounded-3xl p-8"><h3>RM Consumed</h3><div class="text-6xl font-bold text-orange-400">8,194</div></div>
+      </div>
+      <div class="glass rounded-3xl p-8">
+        <button onclick="fakeUpload()" class="bg-violet-600 hover:bg-violet-700 w-full py-6 rounded-2xl text-xl font-medium">📤 Upload Monthly Sales Report (PDF / Excel)</button>
+        <canvas id="salesChart" class="mt-10"></canvas>
+      </div>
+    </div>
+
+    <!-- Branch Ranking -->
+    <div id="tab-2" class="tab-content hidden">
+      <div class="glass rounded-3xl p-8">
+        <h2 class="text-2xl mb-6">Branch Ranking - Qassim Area</h2>
+        <table class="w-full"><thead><tr class="text-violet-300"><th class="text-left">Rank</th><th>Branch</th><th>Sales RM</th><th>Customers</th></tr></thead>
+        <tbody id="rank-body" class="text-white"></tbody></table>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div id="tab-3" class="tab-content hidden">
+      <div class="glass rounded-3xl p-12 text-center text-2xl">All previous data is saved on Firebase (will be added in next step)</div>
+    </div>
+  </div>
+
+  <script>
+    function showTab(n) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+      document.getElementById('tab-'+n).classList.remove('hidden');
+    }
+
+    const salesData = [{month:'Jan',rm:1427},{month:'Feb',rm:717},{month:'Mar',rm:3631},{month:'Apr',rm:2419}];
+
+    let chart;
+    function loadChart() {
+      const ctx = document.getElementById('salesChart');
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: salesData.map(d => d.month), datasets: [{ label: 'Sales RM', data: salesData.map(d => d.rm), borderColor: '#a78bfa', tension: 0.4, borderWidth: 5 }] },
+        options: { plugins: { legend: { display: false } } }
+      });
+    }
+
+    function loadInventory() {
+      document.getElementById('inv-body').innerHTML = `
+        <tr class="border-b border-white/10"><td class="py-4">130 Oz TUB</td><td class="py-4">450</td><td class="py-4"><input type="number" value="432" class="bg-transparent text-center w-20"></td><td class="py-4 text-red-400">-18</td></tr>
+        <tr class="border-b border-white/10"><td class="py-4">46 Oz TUB</td><td class="py-4">320</td><td class="py-4"><input type="number" value="320" class="bg-transparent text-center w-20"></td><td class="py-4 text-emerald-400">0</td></tr>
+        <tr><td class="py-4">NACHOS TRAY</td><td class="py-4">180</td><td class="py-4"><input type="number" value="195" class="bg-transparent text-center w-20"></td><td class="py-4 text-emerald-400">+15</td></tr>`;
+    }
+
+    function loadRanking() {
+      document.getElementById('rank-body').innerHTML = `
+        <tr class="border-b"><td class="py-5 font-bold text-3xl">1</td><td class="py-5">Unaizah</td><td class="py-5">RM 12,450</td><td class="py-5">1,245</td></tr>
+        <tr class="border-b"><td class="py-5 font-bold text-3xl">2</td><td class="py-5">Buraydah</td><td class="py-5">RM 9,850</td><td class="py-5">980</td></tr>
+        <tr><td class="py-5 font-bold text-3xl">3</td><td class="py-5">Al Midhnab</td><td class="py-5">RM 7,630</td><td class="py-5">810</td></tr>`;
+    }
+
+    function fakeUpload() {
+      alert("✅ File received!\n\nIn the full version this will automatically read your Sales RM Consumed PDFs and update all numbers.");
+      loadChart();
+    }
+
+    window.onload = () => {
+      loadInventory();
+      loadChart();
+      loadRanking();
+      showTab(0);
+    };
+  </script>
+</body>
+</html>
