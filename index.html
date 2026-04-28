@@ -1,41 +1,483 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Noir Cinema • Inventory & Performance</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <style>
-    :root { --noir-purple: #7A2A90; }
-    body { background: linear-gradient(135deg, #1a0f2e, #2a1a3f); }
-    .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); border: 1px solid rgba(122,42,144,0.35); }
-    .logo-circle {
-      width: 72px; height: 72px;
-      background: #7A2A90;
-      border-radius: 9999px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 36px;
-      border: 5px solid rgba(255,255,255,0.25);
-      box-shadow: 0 0 35px #7A2A90;
-      position: relative;
-    }
-    .purple-glow { text-shadow: 0 0 25px #7A2A90; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noir Cinema • Inventory Counter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        
+        :root {
+            --primary-purple: #7c3aed;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .font-display {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+
+        .glass {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .dropzone {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .dropzone.dragover {
+            background-color: rgba(124, 58, 237, 0.1);
+            border-color: #7c3aed;
+            transform: scale(1.01);
+        }
+
+        .inventory-card {
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
+        }
+
+        .step-badge {
+            background: rgba(124, 58, 237, 0.15);
+            color: #c4b5fd;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+        }
+
+        .file-item {
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cinema-glow {
+            box-shadow: 0 0 30px rgba(124, 58, 237, 0.3);
+        }
+    </style>
 </head>
-<body class="text-white min-h-screen pb-12">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-6">
-    <!-- Header - Official Brand Logo -->
-    <div class="flex justify-between items-center mb-10">
-      <div class="flex items-center gap-4">
-        <!-- Official Logo Circle -->
-        <div class="logo-circle">🕴️</div>
-        <div>
-          <h1 class="text-4xl sm:text-5xl font-bold tracking-[-1px] purple-glow">Noir Cinema</h1>
-          <p class="text-[#7A2A90] text-2xl font-medium -mt-1">نوار سينما</p>
+<body class="bg-[#0f0c1f] text-white min-h-screen">
+    <!-- Top Navigation -->
+    <nav class="border-b border-white/10 bg-[#0f0c1f]/80 backdrop-blur-xl fixed w-full z-50">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex items-center gap-x-4">
+                    <div class="w-11 h-11 bg-gradient-to-br from-violet-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg cinema-glow">
+                        <div class="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-film text-violet-600 text-lg"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-x-1.5">
+                            <span class="font-display text-3xl font-semibold tracking-tighter">Noir Cinema</span>
+                        </div>
+                        <div class="text-[10px] text-white/50 -mt-1 tracking-[2px] font-medium">INVENTORY COUNTER</div>
+                    </div>
+                </div>
+
+                <!-- User Profile -->
+                <div class="flex items-center gap-x-3">
+                    <div class="flex items-center gap-x-2.5 px-4 py-1.5 rounded-3xl bg-white/5 border border-white/10">
+                        <div class="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse"></div>
+                        <div>
+                            <span class="text-sm font-medium">Skylr</span>
+                            <span class="text-white/40 text-sm">· Developer</span>
+                        </div>
+                    </div>
+                    
+                    <div class="w-9 h-9 bg-zinc-800 rounded-2xl overflow-hidden border border-white/10">
+                        <img src="https://i.pravatar.cc/36?img=12" alt="Skylr" class="w-full h-full object-cover">
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-      <div id="location-banner" class="glass px-6 py-3 rounded-3xl text-lg font-medium"></div>
+    </nav>
+
+    <div class="pt-20">
+        <!-- Main Content -->
+        <div class="max-w-4xl mx-auto px-6 pt-16 pb-24">
+            
+            <!-- Step Indicator -->
+            <div class="flex justify-center mb-8">
+                <div class="step-badge inline-flex items-center gap-x-2 px-5 py-1.5 rounded-3xl text-sm font-medium">
+                    <i class="fa-solid fa-upload text-xs"></i>
+                    <span>STEP 1 • UPLOAD SAP REPORT</span>
+                </div>
+            </div>
+
+            <!-- Hero Text -->
+            <div class="text-center mb-12">
+                <h1 class="font-display text-7xl font-semibold tracking-tighter mb-4 leading-none">
+                    Physical Inventory<br>Counter
+                </h1>
+                <p class="max-w-md mx-auto text-lg text-white/60">
+                    Upload your SAP stock report PDF. The system automatically detects all warehouses inside, then lets you pick one to count.
+                </p>
+            </div>
+
+            <!-- Upload Card -->
+            <div class="max-w-[520px] mx-auto">
+                <div id="dropzone" 
+                     class="glass dropzone border border-dashed border-white/20 hover:border-violet-500/50 rounded-3xl p-14 text-center cursor-pointer inventory-card">
+                    
+                    <!-- Upload Icon -->
+                    <div class="mx-auto w-20 h-20 bg-gradient-to-br from-violet-600 to-purple-600 rounded-3xl flex items-center justify-center mb-8 shadow-xl">
+                        <i class="fa-solid fa-cloud-upload-alt text-white text-4xl"></i>
+                    </div>
+                    
+                    <h3 class="text-3xl font-semibold tracking-tight mb-3">Drop your SAP stock report here</h3>
+                    <p class="text-white/50 text-base">or click to browse from your device</p>
+                    
+                    <input type="file" id="fileInput" accept=".pdf" class="hidden">
+                    
+                    <div class="mt-8">
+                        <button onclick="document.getElementById('fileInput').click()"
+                                class="px-8 py-3.5 bg-white text-black font-semibold rounded-2xl flex items-center gap-x-3 mx-auto hover:bg-white/90 active:scale-[0.985] transition-all text-sm shadow-xl">
+                            <i class="fa-solid fa-file-pdf text-red-500"></i>
+                            <span>Choose PDF</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Uploaded File Status -->
+                <div id="fileStatus" class="hidden mt-4">
+                    <div class="glass rounded-3xl p-5 border border-white/10">
+                        <div class="flex items-center gap-x-4">
+                            <div class="w-12 h-12 bg-red-500/10 rounded-2xl flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-file-pdf text-red-400 text-3xl"></i>
+                            </div>
+                            
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div id="fileName" class="font-semibold text-white truncate"></div>
+                                        <div id="fileSize" class="text-xs text-white/50"></div>
+                                    </div>
+                                    
+                                    <div class="flex items-center gap-x-1.5">
+                                        <div class="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-medium rounded-2xl flex items-center gap-x-1">
+                                            <i class="fa-solid fa-check text-xs"></i>
+                                            <span>Ready</span>
+                                        </div>
+                                        
+                                        <button onclick="removeFile()" 
+                                                class="w-8 h-8 flex items-center justify-center text-white/40 hover:text-red-400 hover:bg-white/5 rounded-2xl transition-colors">
+                                            <i class="fa-solid fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 flex justify-end">
+                        <button onclick="processReport()" 
+                                class="px-9 py-3.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:brightness-110 active:scale-[0.985] transition-all font-semibold rounded-2xl flex items-center gap-x-3 text-sm shadow-xl">
+                            <span>Continue to Warehouse Selection</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-16">
+                <div class="inline-flex items-center gap-x-2 text-xs text-white/40">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Secure • SAP-certified • 256-bit encrypted</span>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Processing Modal -->
+    <div id="processingModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center">
+        <div class="glass max-w-sm w-full mx-4 rounded-3xl p-9 text-center border border-white/10">
+            <div class="mx-auto w-16 h-16 border-4 border-violet-500 border-t-transparent rounded-full animate-spin mb-6"></div>
+            
+            <h4 class="text-2xl font-semibold mb-2">Analyzing Report...</h4>
+            <p class="text-white/60 text-sm mb-6">Detecting warehouses and stock items</p>
+            
+            <div class="space-y-2 text-left text-sm">
+                <div class="flex justify-between text-white/70">
+                    <span>Reading PDF structure</span>
+                    <span class="text-emerald-400">✓</span>
+                </div>
+                <div class="flex justify-between text-white/70">
+                    <span>Extracting warehouse codes</span>
+                    <span class="text-emerald-400">✓</span>
+                </div>
+                <div class="flex justify-between text-white/70">
+                    <span>Mapping stock levels</span>
+                    <span class="animate-pulse">...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function initializeTailwind() {
+            document.documentElement.style.setProperty('--accent-purple', '#7c3aed');
+        }
+        
+        function setupDropzone() {
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('fileInput');
+            
+            dropzone.addEventListener('click', () => fileInput.click());
+            
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('dragover');
+            });
+            
+            dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+            
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                if (file && file.type === 'application/pdf') handleFile(file);
+                else showError('Please upload a PDF file only.');
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files[0]) handleFile(e.target.files[0]);
+            });
+            
+            document.addEventListener('dragover', e => e.preventDefault());
+            document.addEventListener('drop', e => e.preventDefault());
+        }
+        
+        function handleFile(file) {
+            if (file.type !== 'application/pdf') {
+                showError('Only PDF files are supported.');
+                return;
+            }
+            
+            document.getElementById('dropzone').classList.add('hidden');
+            const statusDiv = document.getElementById('fileStatus');
+            statusDiv.classList.remove('hidden');
+            statusDiv.classList.add('file-item');
+            
+            document.getElementById('fileName').textContent = file.name;
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            document.getElementById('fileSize').textContent = `${sizeMB} MB • SAP Stock Report`;
+            window.uploadedFile = file;
+        }
+        
+        function removeFile() {
+            document.getElementById('dropzone').classList.remove('hidden');
+            document.getElementById('fileStatus').classList.add('hidden');
+            document.getElementById('fileInput').value = '';
+            window.uploadedFile = null;
+        }
+        
+        function showError(message) {
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3.5 rounded-2xl bg-red-500/90 text-white text-sm flex items-center gap-x-3 shadow-2xl z-[200]`;
+            toast.innerHTML = `<i class="fa-solid fa-exclamation-triangle"></i> <span>${message}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.transition = 'all 0.3s ease';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 2800);
+        }
+        
+        function processReport() {
+            const modal = document.getElementById('processingModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                showWarehouseSelection();
+            }, 2450);
+        }
+        
+        function showWarehouseSelection() {
+            const container = document.querySelector('.max-w-4xl');
+            container.innerHTML = `
+                <div class="max-w-[620px] mx-auto">
+                    <div class="flex justify-center mb-6">
+                        <div class="inline-flex items-center gap-x-2 px-4 py-1.5 bg-emerald-500/10 text-emerald-400 rounded-3xl text-sm">
+                            <i class="fa-solid fa-check-double"></i>
+                            <span class="font-medium">Report processed successfully</span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mb-10">
+                        <h2 class="font-display text-5xl font-semibold tracking-tighter mb-3">Select Warehouse</h2>
+                        <p class="text-white/60">We detected <span class="font-semibold text-white">4 warehouses</span> in your report</p>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        ${createWarehouseCard('WH-001', 'Main Distribution Center', 'Riyadh', '124,892', '98.4%')}
+                        ${createWarehouseCard('WH-003', 'Jeddah Logistics Hub', 'Jeddah', '87,450', '76.2%')}
+                        ${createWarehouseCard('WH-007', 'Dammam Regional Store', 'Dammam', '41,203', '54.1%')}
+                        ${createWarehouseCard('WH-012', 'Mecca Storage Facility', 'Mecca', '19,874', '31.8%')}
+                    </div>
+                    
+                    <div class="mt-10 flex justify-center">
+                        <button onclick="startCounting()" class="px-10 py-4 bg-white text-black font-semibold rounded-2xl flex items-center gap-x-3 text-base shadow-xl active:scale-[0.985] transition-all">
+                            <span>Start Physical Count</span>
+                            <i class="fa-solid fa-play"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="text-center mt-6">
+                        <button onclick="location.reload()" class="text-white/50 hover:text-white text-sm flex items-center gap-x-2 mx-auto">
+                            <i class="fa-solid fa-undo text-xs"></i>
+                            <span>Upload different report</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function createWarehouseCard(code, name, location, items, accuracy) {
+            return `
+                <div onclick="selectWarehouse('${code}', '${name}')" class="glass group border border-white/10 hover:border-violet-500/60 rounded-3xl p-5 flex items-center gap-x-5 cursor-pointer transition-all active:scale-[0.985]">
+                    <div class="w-14 h-14 bg-gradient-to-br from-violet-600/80 to-purple-600/80 rounded-2xl flex-shrink-0 flex items-center justify-center">
+                        <i class="fa-solid fa-warehouse text-white text-3xl"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-mono text-xs text-white/50">${code}</div>
+                                <div class="font-semibold text-lg tracking-tight group-hover:text-violet-400 transition-colors">${name}</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-medium">${items} items</div>
+                                <div class="text-xs text-emerald-400">${accuracy} accuracy</div>
+                            </div>
+                        </div>
+                        <div class="mt-1 flex items-center gap-x-1.5 text-xs text-white/50">
+                            <i class="fa-solid fa-map-marker-alt"></i>
+                            <span>${location}</span>
+                        </div>
+                    </div>
+                    <div class="text-violet-400 opacity-0 group-hover:opacity-100 transition-all">
+                        <i class="fa-solid fa-chevron-right text-xl"></i>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function selectWarehouse(code, name) {
+            const container = document.querySelector('.max-w-4xl');
+            container.innerHTML = `
+                <div class="max-w-lg mx-auto text-center pt-12">
+                    <div class="mx-auto w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mb-8">
+                        <i class="fa-solid fa-check text-white text-5xl"></i>
+                    </div>
+                    <h2 class="font-display text-5xl font-semibold tracking-tighter mb-3">Ready to Count</h2>
+                    <p class="text-xl text-white/70">You're now counting <span class="font-semibold text-white">${name}</span></p>
+                    
+                    <div class="my-10 p-6 glass rounded-3xl border border-white/10 text-left">
+                        <div class="flex justify-between text-sm mb-4">
+                            <span class="text-white/60">Warehouse Code</span>
+                            <span class="font-mono font-semibold">${code}</span>
+                        </div>
+                        <div class="flex justify-between text-sm mb-4">
+                            <span class="text-white/60">Total SKUs</span>
+                            <span class="font-semibold">124,892</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-white/60">Last Count</span>
+                            <span class="font-semibold">Jan 12, 2026</span>
+                        </div>
+                    </div>
+                    
+                    <button onclick="startCountingSession()" class="w-full py-4 bg-gradient-to-r from-violet-600 to-purple-600 font-semibold rounded-2xl text-lg flex items-center justify-center gap-x-3 active:scale-[0.985] transition-all shadow-xl">
+                        <span>Begin Physical Inventory Count</span>
+                        <i class="fa-solid fa-play ml-1"></i>
+                    </button>
+                    
+                    <div class="mt-4 text-xs text-white/50">This will open the counting interface</div>
+                </div>
+            `;
+        }
+        
+        function startCounting() {
+            const container = document.querySelector('.max-w-4xl');
+            container.innerHTML = `
+                <div class="text-center py-20">
+                    <div class="mx-auto w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa-solid fa-clipboard-list text-4xl text-white/70"></i>
+                    </div>
+                    <h3 class="text-3xl font-semibold mb-3">Counting Mode Activated</h3>
+                    <p class="text-white/60 max-w-xs mx-auto">The full counting interface would open here in the real application.</p>
+                    <div class="mt-10">
+                        <button onclick="location.reload()" class="px-8 py-3 text-sm border border-white/20 hover:bg-white/5 rounded-2xl transition-colors">← Back to Home</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function startCountingSession() {
+            alert("🎉 In a real app, this would launch the full barcode scanning / counting interface.\\n\\nThanks for testing the Noir Cinema Inventory Counter demo!");
+            setTimeout(() => location.reload(), 1200);
+        }
+        
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                if (e.key === "?" && document.activeElement.tagName === "BODY") {
+                    e.preventDefault();
+                    const dropzone = document.getElementById('dropzone');
+                    if (!dropzone.classList.contains('hidden')) document.getElementById('fileInput').click();
+                }
+                if (e.metaKey && e.key === "Enter") {
+                    const status = document.getElementById('fileStatus');
+                    if (!status.classList.contains('hidden')) {
+                        e.preventDefault();
+                        processReport();
+                    }
+                }
+            });
+            
+            let nCount = 0;
+            document.addEventListener('keypress', function(e) {
+                if (e.key.toLowerCase() === 'n') {
+                    nCount++;
+                    if (nCount === 5) {
+                        nCount = 0;
+                        document.body.style.transition = 'filter 0.6s ease';
+                        document.body.style.filter = 'hue-rotate(280deg) saturate(1.3)';
+                        setTimeout(() => document.body.style.filter = 'none', 1400);
+                    }
+                }
+            });
+        }
+        
+        function init() {
+            initializeTailwind();
+            setupDropzone();
+            setupKeyboardShortcuts();
+            setTimeout(() => {
+                const dropzone = document.getElementById('dropzone');
+                if (dropzone) dropzone.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            }, 800);
+            console.log('%c[Noir Cinema] Inventory Counter ready. Try dragging a PDF or pressing "?"', 'color:#64748b');
+        }
+        
+        window.onload = init;
+    </script>
+</body>
+</html>
